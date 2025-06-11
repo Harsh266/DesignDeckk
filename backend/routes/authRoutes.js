@@ -18,17 +18,18 @@ router.post('/refresh-token', verifyToken, async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    
+
     const newToken = createToken(user);
     res.cookie('token', newToken, {
       httpOnly: true,
       sameSite: 'None',
       secure: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000
+      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
     });
-    
-    res.json({ message: 'Token refreshed' });
+
+    res.json({ message: 'Token refreshed', user });
   } catch (err) {
+    console.error('Token refresh error:', err);
     res.status(500).json({ error: err.message });
   }
 });

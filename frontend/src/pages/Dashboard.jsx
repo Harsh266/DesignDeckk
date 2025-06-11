@@ -1,21 +1,40 @@
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { useContext } from "react";
 import { ThemeContext } from "../context/ThemeContext";
+import { AuthContext } from "../context/AuthContext";
 
 const Dashboard = () => {
     const categories = ["Explore", "UI/UX", "Poster", "Logo Design", "App Design"];
     const [activeCategory, setActiveCategory] = useState("Explore");
     const { theme } = useContext(ThemeContext);
+    const { user, loading } = useContext(AuthContext);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!loading && !user) {
+            navigate('/signin');
+        }
+    }, [user, loading, navigate]);
+
+    if (loading) {
+        return (
+            <div className={`min-h-screen flex items-center justify-center ${theme === "dark" ? "bg-black text-white" : "bg-white text-black"}`}>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
+
+    if (!user) {
+        return null;
+    }
 
     const cards = [
         { title: "Portfolio / Animation", user: "Unknown User", media: "https://cdn.dribbble.com/userupload/14090638/file/original-8bb2193fbab4f9b1cac096f86b611e99.mp4", type: "video", thumbnail: "https://cdn.dribbble.com/userupload/14090637/file/still-f1c0df70f1c15486b88334c0bda65b61.png?format=webp&resize=450x338&vertical=center", userImage: "https://randomuser.me/api/portraits/men/3.jpg" },
         { title: "Tecnology Mobile App UI Design", user: "Unknown User", media: "https://cdn.dribbble.com/userupload/36060013/file/original-2aa7a89ad7453a979c3e096fb73a9be7.jpeg?resize=1200x900&vertical=center", type: "image", userImage: "https://randomuser.me/api/portraits/women/2.jpg" },
         { title: "AIR1-07", user: "Unknown User", media: "https://cdn.dribbble.com/userupload/36368152/file/original-f2d9372b4ed87813ef10eea93953b31d.mp4", type: "video", thumbnail: "https://cdn.dribbble.com/userupload/36368151/file/still-0ae21d5de367235c8618fb3acfa5c2cc.png?format=webp&resize=450x338&vertical=center", userImage: "https://randomuser.me/api/portraits/men/3.jpg" },
-        { title: "Perchi Logo Design", user: "Unknown User", media: "https://cdn.dribbble.com/userupload/36162633/file/original-e8e53f0e5656a06b27050423d21ffaee.jpg?resize=1200x900&vertical=center", type: "image", userImage: "https://randomuser.me/api/portraits/women/4.jpg" },
-        { title: "CGPT Tap Game — Explainer Video", user: "Unknown User", media: "https://cdn.dribbble.com/userupload/16763108/file/original-4c38aa030b4337fbb5d1114efa245e34.mp4", type: "video", thumbnail: "https://cdn.dribbble.com/userupload/16763107/file/still-3de5994da3cac2d4170eb51b7c0bb6b1.png?format=webp&resize=450x338&vertical=center", userImage: "https://randomuser.me/api/portraits/men/3.jpg" },
         { title: "Music Festival", user: "Unknown User", media: "https://cdn.dribbble.com/userupload/36238146/file/original-00f3a3bb4248a233f7c5b9ac092f4d2c.jpg?resize=1200x1434&vertical=center", type: "image", userImage: "https://randomuser.me/api/portraits/women/6.jpg" }
     ];
 

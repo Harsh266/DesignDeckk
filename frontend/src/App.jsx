@@ -1,6 +1,7 @@
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
+import { AuthProvider } from "./context/AuthContext";
 import Signin from "./pages/Signin";
 import Signup from "./pages/Signup";
 import Contactus from "./pages/Contactus";
@@ -24,25 +25,27 @@ function App() {
     <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
       <HelmetProvider>
         <ThemeProvider>
-          <Router>
-            <Routes>
-              <Route path="/" element={<Landingpage />} />
-              <Route path="/signin" element={<Signin />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/profilepage" element={<Profilepage />} />
-              <Route path="/contactus" element={<Contactus />} />
-              <Route path="/logout" element={<Landingpage />} />
-              <Route path="/view" element={<Projectview />} />
-              <Route path="/upload" element={<Uploadprojectpage />} />
-              <Route path="/otheruser" element={<Profilepageothers />} />
-              <Route path="/resetpassword" element={<ResetPassword />} />
-              <Route path="/changepassword" element={<ChangePassword />} />
-              <Route path="/user-notifications" element={<UserNotifications />} />
-              <Route path="/admin-dashboard" element={<AdminDashboard />} />
-              <Route path="*" element={<Landingpage />} />
-            </Routes>
-          </Router>
+          <AuthProvider>
+            <Router>
+              <Routes>
+                <Route path="/" element={<Landingpage />} />
+                <Route path="/signin" element={<Signin />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/profilepage" element={<Profilepage />} />
+                <Route path="/contactus" element={<Contactus />} />
+                <Route path="/logout" element={<Landingpage />} />
+                <Route path="/view" element={<Projectview />} />
+                <Route path="/upload" element={<Uploadprojectpage />} />
+                <Route path="/otheruser" element={<Profilepageothers />} />
+                <Route path="/resetpassword" element={<ResetPassword />} />
+                <Route path="/changepassword" element={<ChangePassword />} />
+                <Route path="/user-notifications" element={<UserNotifications />} />
+                <Route path="/admin-dashboard" element={<AdminDashboard />} />
+                <Route path="*" element={<Landingpage />} />
+              </Routes>
+            </Router>
+          </AuthProvider>
         </ThemeProvider>
       </HelmetProvider>
     </GoogleOAuthProvider>

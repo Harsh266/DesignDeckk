@@ -1,22 +1,66 @@
 import { createContext, useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "../services/api";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchUser = async () => {
+    const checkAuth = async () => {
+        try {
+            const res = await axiosInstance.get("/auth/me");
+            setUser(res.data);
+        } catch (error) {
+            console.error("Auth check failed:", error);
+            setUser(null);
+            // Try to refresh token if auth check fails
             try {
-                const res = await axios.get("http://localhost:5000/auth/me", { withCredentials: true });
-                setUser(res.data.user);
-            } catch (error) {
+                await axiosInstance.post('/auth/refresh-token');
+                // If refresh successful, try auth check again
+                const retryRes = await axiosInstance.get("/auth/me");
+                setUser(retryRes.data);
+            } catch (refreshError) {
+                console.error("Token refresh failed:", refreshError);
                 setUser(null);
             }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Set up periodic token refresh
+    useEffect(() => {
+        const REFRESH_INTERVAL = 20 * 60 * 1000; // Refresh every 20 minutes
+
+        const refreshToken = async () => {
+            try {
+                await axiosInstance.post('/auth/refresh-token');
+            } catch (error) {
+                console.error('Token refresh failed:', error);
+            }
         };
-        fetchUser();
+
+        const intervalId = setInterval(refreshToken, REFRESH_INTERVAL);
+
+        return () => clearInterval(intervalId);
     }, []);
 
-    return <AuthContext.Provider value={{ user, setUser }}>{children}</AuthContext.Provider>;
+    // Initial auth check
+    useEffect(() => {
+        checkAuth();
+    }, []);
+
+    const value = {
+        user,
+        setUser,
+        loading,
+        checkAuth
+    };
+
+    return (
+        <AuthContext.Provider value={value}>
+            {children}
+        </AuthContext.Provider>
+    );
 };
