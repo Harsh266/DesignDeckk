@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('passport');
-const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');// Add this new route
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const verifyToken = require("../middleware/authMiddleware");
@@ -9,8 +9,29 @@ const router = express.Router();
 
 // Helper to create JWT
 const createToken = (user) => {
-  return jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
+
+router.post('/refresh-token', verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    const newToken = createToken(user);
+    res.cookie('token', newToken, {
+      httpOnly: true,
+      sameSite: 'None',
+      secure: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+    
+    res.json({ message: 'Token refreshed' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // Register Route
 router.post('/register', async (req, res) => {
