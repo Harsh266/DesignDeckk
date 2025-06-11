@@ -31,7 +31,7 @@ router.post('/register', async (req, res) => {
     const token = createToken(newUser);
     res.cookie('token', token, {
       httpOnly: true,
-      sameSite: 'Lax',
+      sameSite: 'None',
       secure: process.env.NODE_ENV === 'production',
     });
 
@@ -54,7 +54,7 @@ router.post('/login', async (req, res) => {
     const token = createToken(user);
     res.cookie('token', token, {
       httpOnly: true,
-      sameSite: 'Lax',
+      sameSite: 'None',
       secure: process.env.NODE_ENV === 'production',
     });
 
@@ -64,6 +64,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// Get logged-in user
 router.get("/me", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("name email profileImage");
@@ -78,26 +79,28 @@ router.get("/me", verifyToken, async (req, res) => {
 
 // Logout Route
 router.get('/logout', (req, res) => {
-  res.clearCookie('token');
+  res.clearCookie('token', {
+    httpOnly: true,
+    sameSite: 'None',
+    secure: process.env.NODE_ENV === 'production',
+  });
   res.status(200).json({ message: 'Logged out successfully' });
 });
 
 // Google OAuth
-// Step 1: Initiate Google OAuth
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-// Step 2: Google OAuth Callback
 router.get('/google/callback',
   passport.authenticate('google', { failureRedirect: '/login', session: false }),
   (req, res) => {
     const token = createToken(req.user);
     res.cookie('token', token, {
       httpOnly: true,
-      sameSite: 'Lax',
+      sameSite: 'None',
       secure: process.env.NODE_ENV === 'production',
     });
 
-    res.redirect(process.env.CLIENT_URL + "/dashboard"); // Redirect to your frontend dashboard
+    res.redirect(process.env.CLIENT_URL + "/dashboard");
   }
 );
 
