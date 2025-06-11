@@ -1,12 +1,21 @@
+// import axios from 'axios';
+
+// const axiosInstance = axios.create({
+//   baseURL: 'https://designdeckk.onrender.com', // your backend URL
+//   withCredentials: true, // IMPORTANT for cookies to work
+// });
+
+// export default axiosInstance;
+
+// utils/axios.js
 import axios from "axios";
 
-const API_URL = "http://localhost:5000";
+const axiosInstance = axios.create({
+  baseURL: "https://designdeckk.onrender.com", // or http://localhost:5000/api
+  withCredentials: true, // allow sending cookies
+  headers: {
+    "Content-Type": "application/json", // ensure JSON format
+  },
+});
 
-export const getMessage = async () => {
-    try {
-        const response = await axios.get(`${API_URL}/`);
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching message", error);
-    }
-};
+export default axiosInstance;
