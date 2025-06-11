@@ -32,7 +32,8 @@ router.post('/register', async (req, res) => {
     res.cookie('token', token, {
       httpOnly: true,
       sameSite: 'None',
-      secure: process.env.NODE_ENV === 'production',
+      secure: true, // must be true on production with HTTPS
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
     res.status(201).json({ user: newUser });
@@ -55,7 +56,8 @@ router.post('/login', async (req, res) => {
     res.cookie('token', token, {
       httpOnly: true,
       sameSite: 'None',
-      secure: process.env.NODE_ENV === 'production',
+      secure: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
     res.status(200).json({ user });
@@ -64,7 +66,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Get logged-in user
+// Authenticated User Info Route
 router.get("/me", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("name email profileImage");
@@ -82,12 +84,12 @@ router.get('/logout', (req, res) => {
   res.clearCookie('token', {
     httpOnly: true,
     sameSite: 'None',
-    secure: process.env.NODE_ENV === 'production',
+    secure: true,
   });
   res.status(200).json({ message: 'Logged out successfully' });
 });
 
-// Google OAuth
+// Google OAuth Routes
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 router.get('/google/callback',
@@ -97,7 +99,8 @@ router.get('/google/callback',
     res.cookie('token', token, {
       httpOnly: true,
       sameSite: 'None',
-      secure: process.env.NODE_ENV === 'production',
+      secure: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
     res.redirect(process.env.CLIENT_URL + "/dashboard");
