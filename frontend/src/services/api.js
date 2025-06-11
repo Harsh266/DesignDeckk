@@ -11,7 +11,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000", // or http://localhost:5000/api
+  baseURL: "https://designdeckk.onrender.com/", // or http://localhost:5000/api
   withCredentials: true, // allow sending cookies
   headers: {
     "Content-Type": "application/json", // ensure JSON format
